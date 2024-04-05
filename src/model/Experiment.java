@@ -40,20 +40,17 @@ public class Experiment {
         return (!farm.isBankrupt() && currentYear < contractPeriod);
     }
 
-    public String makeStepAndGetFarmInfo() {
+    public String[] makeStepAndGetFarmInfo() {
         // Функция, которая обрабатывает полный годовой цикл эксперимента
         // и выводит строку со всей необходимой статистической информацией.
-        String info = "";
+        currentYear += 1;
         if (!farm.isBankrupt()) {
             Random random = new Random();
             // Ниже случайная величина, отвечающая за неблагоприятные события
             // окружающей среды.
             double adverseEventRation = random.nextDouble(0.05, 0.2);
-            info += "================================================\n" +
-                    "Год " + (currentYear + 1) + " из " + contractPeriod + "\n" +
-                    "================================================\n";
-            info += farm.makeYearModellingAndGetInfo(
-                    contracts.getBy(currentYear),
+            return farm.makeYearModellingAndGetInfo(
+                    contracts.getBy(currentYear - 1),
                     alpha,
                     beta,
                     delta,
@@ -61,8 +58,7 @@ public class Experiment {
                     adverseEventRation
             );
         }
-        currentYear += 1;
-        return info;
+        return new String[25];
     }
 
     public void currentYearContract(
