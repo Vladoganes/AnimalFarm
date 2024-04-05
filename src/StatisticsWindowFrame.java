@@ -1,6 +1,8 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class StatisticsWindowFrame extends JFrame {
     public static final Object[][] rowNames = new String[][] {
@@ -17,22 +19,22 @@ public class StatisticsWindowFrame extends JFrame {
             {"<html>Рентабельность<br/> (%)<html>"},
             {"Банкрот ?"},
             {"<html>Стоимость <br/>корма (у.е.)<html>"},
-            {"<html>Родилось <br/>Молодых (шт.)<html>"},
-            {"<html>Родилось <br/>Взрослых (шт.)<html>"},
-            {"<html>Родилось <br/>Старых (шт.)<html>"},
+            {"<html>Новое поколение <br/>Молодых (шт.)<html>"},
+            {"<html>Новое поколение <br/>Взрослых (шт.)<html>"},
+            {"<html>Новое поколение <br/>Старых (шт.)<html>"},
             {"<html>Умерло Молодых <br/>из-за корма (шт.)<html>"},
             {"<html>Умерло Взрослых <br/>из-за корма (шт.)<html>"},
             {"<html>Умерло Старых <br/>из-за корма (шт.)<html>"},
             {"<html>Умерло Молодых <br/>из-за природных <br/>условий (шт.)<html>"},
             {"<html>Умерло Взрослых <br/>из-за природных <br/>условий (шт.)<html>"},
             {"<html>Умерло Старых <br/>из-за природных <br/>условий (шт.)<html>"},
-            {"<html>Неустойка всего <br/>за продажу Молодых<br/> (у.е.)<html>"},
-            {"<html>Неустойка всего <br/>за продажу Взрослых<br/> (у.е.)<html>"},
-            {"<html>Неустойка всего <br/>за продажу Старых<br/> (у.е.)<html>"}
+            {"<html>Неустойка всего <br/>за продажу <br/>Молодых (у.е.)<html>"},
+            {"<html>Неустойка всего <br/>за продажу <br/>Взрослых (у.е.)<html>"},
+            {"<html>Неустойка всего <br/>за продажу <br/>Старых (у.е.)<html>"}
     };
 
     public static final Object[] columnNames = new String[] {
-            "Все параметры",
+            "<html>Все <br/>параметры<html>",
             "1 год",
             "2 год",
             "3 год",
@@ -44,17 +46,21 @@ public class StatisticsWindowFrame extends JFrame {
     private JLabel tableName;
     private DefaultTableModel model;
     private JTable statisticsTable;
+    private JButton hideButton;
 
     Font titleFont = new Font("Arial", Font.BOLD, 28);
     Font tableColumnTitlesFont = new Font("Arial", Font.BOLD, 20);
-    Font severalTextFont = new Font("Arial", Font.PLAIN, 14);
+    Font severalTextFont = new Font("Arial", Font.PLAIN, 16);
 
     public StatisticsWindowFrame() {
         super("AnimalFarm: Statistics");
-        setBounds(500, 100, 1000, 600);
+        setBounds(580, 100, 900, 600);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tableContainer = new JPanel(new BorderLayout());
+        hideButton = new JButton("Закрыть");
+        hideButton.setFont(tableColumnTitlesFont);
+        hideButton.addActionListener(e -> setVisible(false));
         tableName = new JLabel("Статистика по ферме", JLabel.CENTER);
         tableName.setFont(titleFont);
         model = new DefaultTableModel();
@@ -63,9 +69,12 @@ public class StatisticsWindowFrame extends JFrame {
         for (Object[] rowName : rowNames) {
             model.addRow(rowName);
         }
+        statisticsTable.setCellSelectionEnabled(true);
+        Color shampine = new Color(240, 231, 185);
+        statisticsTable.setBackground(shampine);
 
         statisticsTable.getTableHeader().setFont(tableColumnTitlesFont);
-        statisticsTable.setRowHeight(55);
+        statisticsTable.setRowHeight(70);
         statisticsTable.setFont(severalTextFont);
         tableContainer.add(tableName, BorderLayout.NORTH);
         tableContainer.add(new JScrollPane(
@@ -74,6 +83,7 @@ public class StatisticsWindowFrame extends JFrame {
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
                 BorderLayout.CENTER
         );
+        tableContainer.add(hideButton, BorderLayout.SOUTH);
         add(tableContainer);
         setVisible(true);
         repaint();
