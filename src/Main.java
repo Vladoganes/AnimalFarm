@@ -11,7 +11,7 @@ public class Main {
     private static StatisticsWindowFrame statisticsWindowFrame;
 
     public static void main(String[] args) {
-        int startFarmLabelY = 40;
+        int startFarmLabelY = 10;
         int startFarmLabelX = 50;
         int startFarmLabelW = 280;
         int startFarmLabelH = 20;
@@ -38,7 +38,7 @@ public class Main {
 
         JFrame mainWindow = new JFrame("AnimalFarm");
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainWindow.setSize(1150,800);
+        mainWindow.setBounds(100, 0, 2 * startFarmLabelX + buttonWidth, 800);
         mainWindow.setLayout(null);
         mainWindow.setVisible(true);
 
@@ -50,35 +50,6 @@ public class Main {
         executeAllStepButton.setFont(buttonsFont);
         JButton exitButton = new JButton("Выход");
         exitButton.setFont(buttonsFont);
-
-        JLabel statisticLabel = new JLabel("Статистика");
-        statisticLabel.setFont(startLabelsFont);
-        statisticLabel.setSize(
-                mainWindow.getWidth() - (startFarmLabelX + buttonWidth + 50) - 30,
-                startFarmLabelH + ySizeBetweenStartLabelAndPanel
-        );
-        JPanel statisticTextPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        statisticTextPanel.setBounds(
-                startFarmLabelX + buttonWidth + 50,
-                startFarmLabelY,
-                mainWindow.getWidth() - (startFarmLabelX + buttonWidth + 50) - 30,
-                startFarmLabelH + farmPanelH + 3 * ySizeBetweenStartLabelAndPanel + contractPanelH
-        );
-        JTextArea statisticTextArea = new JTextArea(
-                "Здесь будет выводиться статистическая информация по ферме",
-                27,
-                57
-        );
-        statisticTextArea.setFont(severalLabelsFont);
-        statisticTextArea.setLineWrap(true);
-        statisticTextArea.setWrapStyleWord(true);
-        statisticTextPanel.add(statisticLabel);
-        statisticTextPanel.add(new JScrollPane(
-                statisticTextArea,
-                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
-        ));
-        statisticTextPanel.revalidate();
 
         JLabel startFarmLabel = new JLabel("Начальные данные фермы");
         startFarmLabel.setFont(startLabelsFont);
@@ -196,8 +167,8 @@ public class Main {
         // Пока не произошла Инициализация модели, нажать эту кнопку нельзя
         executeAllStepButton.setEnabled(false);
         exitButton.setBounds(
-                mainWindow.getWidth() - buttonWidth - 30,
-                buttonsStartY + 2*buttonHeight + 2*ySizeBetweenButtons,
+                farmLabelPanelX,
+                buttonsStartY + 3*buttonHeight + 3*ySizeBetweenButtons,
                 buttonWidth,
                 buttonHeight
         );
@@ -209,8 +180,10 @@ public class Main {
                 // Если нажали на кнопку "Выход", то приложение должно
                 // остановить работу и закрыться.
                 mainWindow.setVisible(false);
-                statisticsWindowFrame.setVisible(false);
-                statisticsWindowFrame.dispose();
+                if (statisticsWindowFrame != null) {
+                    statisticsWindowFrame.setVisible(false);
+                    statisticsWindowFrame.dispose();
+                }
                 mainWindow.dispose();
             }
         });
@@ -235,7 +208,6 @@ public class Main {
                         (int) capitalFarmField.getValue(),
                         (int) periodContractField.getValue()
                 );
-                statisticTextArea.setText("");
                 if (statisticsWindowFrame != null) {
                     statisticsWindowFrame.setVisible(false);
                     statisticsWindowFrame.dispose();
@@ -260,7 +232,8 @@ public class Main {
                             (int) adultFeedContractField.getValue(),
                             (int) penaltyContractField.getValue()
                     );
-                    statisticTextArea.append(experimentModel.makeStepAndGetFarmInfo());
+                    String[] data = experimentModel.makeStepAndGetFarmInfo();
+                    statisticsWindowFrame.setVisible(true);
                     statisticsWindowFrame.getModel().addColumn(
                                     StatisticsWindowFrame.columnNames[
                                             experimentModel.getCurrentYear()]
@@ -269,9 +242,8 @@ public class Main {
                     // заполняем все строки таблицы в соответствии с названиями
                     // строк из StatisticsWindowFrame.rowNames
                     for (int i = 0; i < 25; i++) {
-                        String data = "";
                         statisticsWindowFrame.getStatisticsTable().setValueAt(
-                                data,
+                                data[i],
                                 i,
                                 experimentModel.getCurrentYear()
                         );
@@ -325,7 +297,22 @@ public class Main {
                                 (int) adultFeedContractField.getValue(),
                                 (int) penaltyContractField.getValue()
                         );
-                        statisticTextArea.append(experimentModel.makeStepAndGetFarmInfo());
+                        String[] data = experimentModel.makeStepAndGetFarmInfo();
+                        statisticsWindowFrame.setVisible(true);
+                        statisticsWindowFrame.getModel().addColumn(
+                                StatisticsWindowFrame.columnNames[
+                                        experimentModel.getCurrentYear()]
+                        );
+                        // После того как добавили колонку соответствующего года
+                        // заполняем все строки таблицы в соответствии с названиями
+                        // строк из StatisticsWindowFrame.rowNames
+                        for (int j = 0; j < 25; j++) {
+                            statisticsWindowFrame.getStatisticsTable().setValueAt(
+                                    data[j],
+                                    j,
+                                    experimentModel.getCurrentYear()
+                            );
+                        };
                     } else {
                         break;
                     }
@@ -340,8 +327,6 @@ public class Main {
         mainWindow.add(startContractLabel);
         mainWindow.add(contractLabelsPanel);
         mainWindow.add(contractFieldsPanel);
-        //mainWindow.add(statisticLabel);
-        mainWindow.add(statisticTextPanel);
         mainWindow.add(startButton);
         mainWindow.add(executeOneStepButton);
         mainWindow.add(executeAllStepButton);
