@@ -99,48 +99,40 @@ public class Farm {
         return (countFeedPrice(yearFeedPriceForAdult) <= capital);
     }
 
-    public String payFeedPriceAndGetInfo() {
+    public int[] payFeedPrice() {
         // Функция, которая выплачивает деньги за корм для животных
         // по текущему контракту.
-        // Если денег не хватает на весь корм, то происходит падеж
+        // Если денег не хватает на весь корм, то происходит падежь
         // скота.
-        // Функция возвращает строку, в которой подробно описывается
-        // информация по откорму животных в этом году.
-        String info = "";
+        // Функция возвращает число животных, которые погибли из-за
+        // процесса кормления.
+        int[] result = {0, 0, 0};
         double feedPrice = countFeedPrice(currentContract.getFeedPriceForAdultToPay());
-        info += "\nПроисходит процесс откорма животных!\n";
-        info += "До откорма денег у фирмы: " +
-                new DecimalFormat("#0.00").format(capital) + " у.е.\n";
-        info += "Для полного откорма животных в этом году нужно потратить: " +
-                new DecimalFormat("#0.00").format(feedPrice) + " у.е.\n";
         if (isEnoughMoneyForFeed(currentContract.getFeedPriceForAdultToPay())) {
-            info += "Денег хватает!\n";
             currentYearCost += feedPrice;
             capital -= feedPrice;
         } else {
+            // Корма на всех не хватило, должен произойти пропорциональный
+            // нехватке корма падеж скота.
             double lifestockRatio = 1.0 - (capital / feedPrice);
-            info += "Денег на закупку корма не хватает!\n";
-            info += doLifestockDeathAndGetInfo(lifestockRatio);
+            result = doLifeStockDeath(lifestockRatio);
             currentYearCost += capital;
+            feedPrice = capital;
             capital = 0.0; // заплатили столько, сколько было денег
         }
-        info += "Наличные деньги фирмы после закупки корма составляют: " +
-                new DecimalFormat("#0.00").format(capital) + " у.е.\n";
-        return info;
+        return result;
     }
 
-    public String payPenaltyAndGetInfo(int count) {
+    public double payPenalty(int count) {
         // Функция, которая вызывается при невыполнении условий
         // контракта, где count - число непроданных животных.
         // Можно вызывать отдельно по каждому поколению, но можно
         // и для всех непроданных животных вместе.
         double penalty = currentContract.getPenalty();
         double resultPenalty = 0.0;
-        String info = "";
         for (int i = 0; i < count; i++) {
             resultPenalty += penalty;
         }
-        info += "неустойка = " + new DecimalFormat("#0.00").format(resultPenalty) + " у.е.\n";
         if (capital < resultPenalty) {
             // Эта ситуация означает, что ферма сейчас обанкротится,
             // так как она не может выплатить всю неустойку (не хватит
@@ -153,81 +145,74 @@ public class Farm {
             currentYearCost += resultPenalty;
             capital -= resultPenalty;
         }
-        return info;
+        return resultPenalty;
     }
 
-    public String doLifestockDeathAndGetInfo(double lifestockRatio) {
+    public int[] doLifeStockDeath(double lifestockRatio) {
         // Функция, которая выполняет частичный падеж скота
         // пропорционально для всех поколений животных и
-        // возвращает статистическую информацию о падеже в виде строки.
+        // возвращает количество животных каждого типа,
+        // которые умерли из-за нехватки корма.
+        // На позиции 0 - количество Молодых
+        // на позиции 1 - количество Взрослых
+        // на позиции 2 - количество Старых
         // Эта функция также вызывается и при небоагоприятных
         // событиях окружающей среды.
-        String info = "";
-        info += "\nПроисходит процесс пропорционального падежа скота!\n";
-        info += "До падежа на ферме было:\n";
-        info += "Молодняка: " + youngCount + ", " +
-                "Взрослых: " + adultCount + ", " +
-                "Старых: " + oldCount + ".\n";
+        int[] diedAnimals = {0, 0, 0};
         int youngDeath = (int) (youngCount * lifestockRatio);
         int adultDeath = (int) (adultCount * lifestockRatio);
         int oldDeath = (int) (oldCount * lifestockRatio);
+        diedAnimals[0] = youngDeath;
+        diedAnimals[1] = adultDeath;
+        diedAnimals[2] = oldDeath;
         youngCount -= youngDeath;
         adultCount -= adultDeath;
         oldCount -= oldDeath;
 
-        info += "Посе падежа на ферме стало:\n";
-        info += "Молодняка: " + youngCount + ", " +
-                "Взрослых: " + adultCount + ", " +
-                "Старых: " + oldCount + ".\n";
-        return info;
+        return diedAnimals;
     }
 
-    public String makeAllNewGenerationAndGetInfo(
+    public int[] makeAllNewGeneration(
             double birthCoefficientFromAdult,
             double birthCoefficientFromOld,
             double survivalCoefficientOfYoungAnimal,
             double deathCoefficientOfOldAnimal
     ) {
         // Функция, которая генерирует обновляет поколения животных
-        // на ферме и возвращает статистическую информацию о генерации животных
-        // в виде строки.
-        String info = "";
-        info += "\nПроисходит процесс обновления поколений всех животных!\n";
-        info += "Было на ферме:\n";
-        info += "Молодняка: " + youngCount + ", " +
-                "Взрослых: " + adultCount + ", " +
-                "Старых: " + oldCount + ".\n";
-        youngCount = nextYoungGeneration(birthCoefficientFromAdult, birthCoefficientFromOld);
-        adultCount = nextAdultGeneration(survivalCoefficientOfYoungAnimal);
-        oldCount = nextOldGeneration(deathCoefficientOfOldAnimal);
-        info += "Стало на ферме:\n";
-        info += "Молодняка: " + youngCount + ", " +
-                "Взрослых: " + adultCount + ", " +
-                "Старых: " + oldCount + ".\n";
-        return info;
+        // на ферме и возвращает статистическую информацию о генерации животных,
+        // то есть возвращает количество животных каждого типа, которые
+        // получились при обновлении поколения.
+        // На позиции 0 - число новых Молодых животных
+        // На позиции 1 - число новых Взрослых животных
+        // На позиции 2 - число новых Старых животных
+        // На позиции 3 - число умерших Старых животных
+        int[] result = {0, 0, 0, 0};
+        int newYoungCount = nextYoungGeneration(birthCoefficientFromAdult, birthCoefficientFromOld);
+        result[0] = newYoungCount;
+        int newAdultCount = nextAdultGeneration(survivalCoefficientOfYoungAnimal);
+        result[1] = newAdultCount;
+        int newOldCount = nextOldGeneration(deathCoefficientOfOldAnimal);
+        result[2] = newOldCount;
+        result[3] = (int) (deathCoefficientOfOldAnimal * oldCount);
+        youngCount = newYoungCount;
+        adultCount = newAdultCount;
+        oldCount = newOldCount;
+
+        return result;
     }
 
-    public String sellAnimalsByCurrentContractAndGetInfo() {
+    public double[] sellAnimalsByCurrentContractAndGetInfo() {
         // Функция, которая осуществляет продажу животных
         // на ферме по текущему контракту и возвращает статистическую
-        // информацию о продаже животных в виде строки.
-        String info = "";
-        info += "\nПроисходит процесс продажи животных!\n";
-        info += "До продажи у фермы Было наличных денег: " +
-                new DecimalFormat("#0.00").format(capital) + " у.е.\n\n";
+        // информацию о неустойках по продаже животных.
+        // На позиции 0 - неустойка по продаже Молодых
+        // На поизции 1 - неустойка по продаже Взрослых
+        // На позиции 2 - неустойка по продаже Старых
+        double[] result = {0.0, 0.0, 0.0};
+
         int youngToSell = currentContract.getYoungAnimalsCountToSell();
         int adultToSell = currentContract.getAdultAnimalsCountToSell();
         int oldToSell = currentContract.getOldAnimalsCountToSell();
-
-        info += "До продажи Было на ферме:\n";
-        info += "Молодняка: " + youngCount + ", " +
-                "Взрослых: " + adultCount + ", " +
-                "Старых: " + oldCount + ".\n";
-
-        info += "Требуется продать:\n";
-        info += "Молодняка: " + youngToSell + ", " +
-                "Взрослых: " + adultToSell + ", " +
-                "Старых: " + oldToSell + ".\n";
 
         capital += Math.min(youngToSell, youngCount) * currentContract.getYoungAnimalPrice() +
                 Math.min(adultToSell, adultCount) * currentContract.getAdultAnimalPrice() +
@@ -238,52 +223,27 @@ public class Farm {
 
         if (youngCount < youngToSell) {
             int youngCountNotSold = youngToSell - youngCount;
-            info += "За нарушение контракта по Молодняку: ";
-            info += payPenaltyAndGetInfo(youngCountNotSold);
-            if (isBankrupt) {
-                info += "Ферма не смогла выплатить неустойку за " +
-                        "продажу Молодых животных!\n";
-            }
+            result[0] = payPenalty(youngCountNotSold);
         }
         if (adultCount < adultToSell) {
             int adultCountNotSold = adultToSell - adultCount;
-            info += "За нарушение контракта по Взрослым животным: ";
-            info += payPenaltyAndGetInfo(adultCountNotSold);
-            if (isBankrupt) {
-                info += "Ферма не смогла выплатить неустойку за " +
-                        "продажу Взрослых животных!\n";
-            }
+            result[1] = payPenalty(adultCountNotSold);
         }
         if (oldCount < oldToSell) {
             int oldCountNotSold = oldToSell - oldCount;
-            info += "За нарушение контракта по Старым животным: ";
-            info += payPenaltyAndGetInfo(oldCountNotSold);
-            if (isBankrupt) {
-                info += "Ферма не смогла выплатить неустойку за " +
-                        "продажу Старых животных!\n";
-            }
+            result[2] = payPenalty(oldCountNotSold);
         }
 
         if (!isBankrupt) {
             youngCount -= Math.min(youngToSell, youngCount);
             adultCount -= Math.min(adultToSell, adultCount);
             oldCount -= Math.min(oldToSell, oldCount);
-
-            info += "После продажи Стало на ферме:\n";
-            info += "Молодняка: " + youngCount + ", " +
-                    "Взрослых: " + adultCount + ", " +
-                    "Старых: " + oldCount + ".\n";
-
-            info += "После продажи у фермы Стало наличных денег: " +
-                    new DecimalFormat("#0.00").format(capital) + " у.е.\n";
         } else {
             youngCount = 0;
             adultCount = 0;
             oldCount = 0;
-            info += "Ферма не смогла выполнить контракт по Продаже\n";
-            info += "Ферма - БАНКРОТ!\n";
         }
-        return info;
+        return result;
     }
 
     public double countFullCost() {
@@ -296,7 +256,7 @@ public class Farm {
                 currentContract.getOldAnimalPrice() * oldCount);
     }
 
-    public String makeYearModellingAndGetInfo(
+    public String[] makeYearModellingAndGetInfo(
             Contract currentContract,
             double birthCoefficientFromAdult,
             double birthCoefficientFromOld,
@@ -308,24 +268,63 @@ public class Farm {
         // Задает контракт, по которому работает ферма, выполняет откорм,
         // частичный падеж скота, рост нового поколения, продажу животных
         // на бирже. Возвращает полную детальную информацию о работе фермы
-        // за весь год в виде строки.
-        String info = "";
+        // за весь год в виде массива строк для передачи в таблицу.
+        String[] info = new String[25];
         this.currentContract = currentContract;
         this.currentYearCost = 0.0;
         this.currentYearProfit = 0.0;
-        info += "\nВ начале года Состояние фермы:\n" + getAllCurrentFarmInfo() + "\n";
-        info += payFeedPriceAndGetInfo();
-        info += makeAllNewGenerationAndGetInfo(
+        info[0] = Integer.toString(youngCount);
+        info[1] = Integer.toString(adultCount);
+        info[2] = Integer.toString(oldCount);
+        info[12] = new DecimalFormat("#0.00").format(
+                countFeedPrice(currentContract.getFeedPriceForAdultToPay())
+        );
+        info[6] = new DecimalFormat("#0.00").format(capital);
+
+        // Кормление животных
+        int[] diedInFeedingAnimals = payFeedPrice();
+
+
+        info[16] = Integer.toString(diedInFeedingAnimals[0]);
+        info[17] = Integer.toString(diedInFeedingAnimals[1]);
+        info[18] = Integer.toString(diedInFeedingAnimals[2]);
+
+        // Генерация нового поколения
+        int[] newGeneration = makeAllNewGeneration(
                 birthCoefficientFromAdult,
                 birthCoefficientFromOld,
                 survivalCoefficientOfYoungAnimal,
                 deathCoefficientOfOldAnimal
         );
-        info += sellAnimalsByCurrentContractAndGetInfo();
-        info += "\nПроисходят неблагоприятные события окружающей среды!\n";
-        info += doLifestockDeathAndGetInfo(adverseEventRation);
-        info += "\nВ конце года Состояние фермы:\n" + getAllCurrentFarmInfo() + "\n";
-        info += getCurrentYearProfitabilityInfo();
+
+
+        // Продажа животных по текущему контракту
+        double[] allPenalties = sellAnimalsByCurrentContractAndGetInfo();
+
+
+        info[22] = new DecimalFormat("#0.00").format(allPenalties[0]);
+        info[23] = new DecimalFormat("#0.00").format(allPenalties[1]);
+        info[24] = new DecimalFormat("#0.00").format(allPenalties[2]);
+
+
+        // Смерть животных из-за природных условий
+        int[] diedInAdverseEventsAnimals = doLifeStockDeath(adverseEventRation);
+        info[19] = Integer.toString(diedInAdverseEventsAnimals[0]);
+        info[20] = Integer.toString(diedInAdverseEventsAnimals[1]);
+        info[21] = Integer.toString(diedInAdverseEventsAnimals[2]);
+        info[3] = Integer.toString(youngCount);
+        info[4] = Integer.toString(adultCount);
+        info[5] = Integer.toString(oldCount);
+        info[7] = new DecimalFormat("#0.00").format(capital);
+        info[8] = new DecimalFormat("#0.00").format(currentYearProfit - currentYearCost);
+        info[9] = new DecimalFormat("#0.00").format(currentYearCost);
+        info[10] = new DecimalFormat("#0.00").format(countCurrentYearProfitability());
+        info[11] = Boolean.toString(isBankrupt);
+
+        info[13] = Integer.toString(newGeneration[0]);
+        info[14] = Integer.toString(newGeneration[1]);
+        info[15] = Integer.toString(newGeneration[2]);
+
         return info;
     }
 
