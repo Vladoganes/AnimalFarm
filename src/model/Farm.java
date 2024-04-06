@@ -99,7 +99,7 @@ public class Farm {
         return (countFeedPrice(yearFeedPriceForAdult) <= capital);
     }
 
-    public int[] payFeedPrice() {
+    public int[] payFeedPriceAndGetDiedAnimals() {
         // Функция, которая выплачивает деньги за корм для животных
         // по текущему контракту.
         // Если денег не хватает на весь корм, то происходит падежь
@@ -115,7 +115,7 @@ public class Farm {
             // Корма на всех не хватило, должен произойти пропорциональный
             // нехватке корма падеж скота.
             double lifestockRatio = 1.0 - (capital / feedPrice);
-            result = doLifeStockDeath(lifestockRatio);
+            result = doLifeStockDeathAndGetDiedAnimals(lifestockRatio);
             currentYearCost += capital;
             feedPrice = capital;
             capital = 0.0; // заплатили столько, сколько было денег
@@ -148,7 +148,7 @@ public class Farm {
         return resultPenalty;
     }
 
-    public int[] doLifeStockDeath(double lifestockRatio) {
+    public int[] doLifeStockDeathAndGetDiedAnimals(double lifestockRatio) {
         // Функция, которая выполняет частичный падеж скота
         // пропорционально для всех поколений животных и
         // возвращает количество животных каждого типа,
@@ -172,7 +172,7 @@ public class Farm {
         return diedAnimals;
     }
 
-    public int[] makeAllNewGeneration(
+    public int[] makeAllNewGenerationsAndGetTheirsCount(
             double birthCoefficientFromAdult,
             double birthCoefficientFromOld,
             double survivalCoefficientOfYoungAnimal,
@@ -201,7 +201,7 @@ public class Farm {
         return result;
     }
 
-    public double[] sellAnimalsByCurrentContractAndGetInfo() {
+    public double[] sellAnimalsByCurrentContractAndGetPenaliesForEachType() {
         // Функция, которая осуществляет продажу животных
         // на ферме по текущему контракту и возвращает статистическую
         // информацию о неустойках по продаже животных.
@@ -256,7 +256,7 @@ public class Farm {
                 currentContract.getOldAnimalPrice() * oldCount);
     }
 
-    public String[] makeYearModellingAndGetInfo(
+    public String[] makeYearModellingAndGetInfoForStatTable(
             Contract currentContract,
             double birthCoefficientFromAdult,
             double birthCoefficientFromOld,
@@ -282,7 +282,7 @@ public class Farm {
         info[6] = new DecimalFormat("#0.00").format(capital);
 
         // Кормление животных
-        int[] diedInFeedingAnimals = payFeedPrice();
+        int[] diedInFeedingAnimals = payFeedPriceAndGetDiedAnimals();
 
 
         info[16] = Integer.toString(diedInFeedingAnimals[0]);
@@ -290,7 +290,7 @@ public class Farm {
         info[18] = Integer.toString(diedInFeedingAnimals[2]);
 
         // Генерация нового поколения
-        int[] newGeneration = makeAllNewGeneration(
+        int[] newGeneration = makeAllNewGenerationsAndGetTheirsCount(
                 birthCoefficientFromAdult,
                 birthCoefficientFromOld,
                 survivalCoefficientOfYoungAnimal,
@@ -299,7 +299,7 @@ public class Farm {
 
 
         // Продажа животных по текущему контракту
-        double[] allPenalties = sellAnimalsByCurrentContractAndGetInfo();
+        double[] allPenalties = sellAnimalsByCurrentContractAndGetPenaliesForEachType();
 
 
         info[22] = new DecimalFormat("#0.00").format(allPenalties[0]);
@@ -308,7 +308,7 @@ public class Farm {
 
 
         // Смерть животных из-за природных условий
-        int[] diedInAdverseEventsAnimals = doLifeStockDeath(adverseEventRation);
+        int[] diedInAdverseEventsAnimals = doLifeStockDeathAndGetDiedAnimals(adverseEventRation);
         info[19] = Integer.toString(diedInAdverseEventsAnimals[0]);
         info[20] = Integer.toString(diedInAdverseEventsAnimals[1]);
         info[21] = Integer.toString(diedInAdverseEventsAnimals[2]);

@@ -222,7 +222,7 @@ public class Main {
                 // то просто выполняем для введенных данных полей контракта
                 // 1 год моделирования.
                 if (experimentModel.isExperimentStillGoingOn()) {
-                    experimentModel.currentYearContract(
+                    experimentModel.setCurrentYearContract(
                             (int) youngToSellContractField.getValue(),
                             (int) adultToSellContractField.getValue(),
                             (int) oldToSellContractField.getValue(),
@@ -232,7 +232,7 @@ public class Main {
                             (int) adultFeedContractField.getValue(),
                             (int) penaltyContractField.getValue()
                     );
-                    String[] data = experimentModel.makeStepAndGetFarmInfo();
+                    String[] data = experimentModel.makeStepAndGetFarmStatTableInfo();
                     statisticsWindowFrame.setVisible(true);
                     statisticsWindowFrame.getModel().addColumn(
                                     StatisticsWindowFrame.columnNames[
@@ -287,7 +287,7 @@ public class Main {
                 executeAllStepButton.setEnabled(false);
                 for (int i = experimentModel.getCurrentYear(); i < experimentModel.getContractPeriod(); i++) {
                     if (experimentModel.isExperimentStillGoingOn()) {
-                        experimentModel.currentYearContract(
+                        experimentModel.setCurrentYearContract(
                                 (int) youngToSellContractField.getValue(),
                                 (int) adultToSellContractField.getValue(),
                                 (int) oldToSellContractField.getValue(),
@@ -297,7 +297,7 @@ public class Main {
                                 (int) adultFeedContractField.getValue(),
                                 (int) penaltyContractField.getValue()
                         );
-                        String[] data = experimentModel.makeStepAndGetFarmInfo();
+                        String[] data = experimentModel.makeStepAndGetFarmStatTableInfo();
                         statisticsWindowFrame.setVisible(true);
                         statisticsWindowFrame.getModel().addColumn(
                                 StatisticsWindowFrame.columnNames[

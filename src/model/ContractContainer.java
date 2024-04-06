@@ -8,11 +8,11 @@ public class ContractContainer {
         this.size = period;
     }
 
-    public void putBy(int index, Contract contract) {
+    public void insertAndCreateContractBy(int index, Contract contract) {
         this.contracts[index] = contract;
     }
 
-    public void putBy(
+    public void insertAndCreateContractBy(
             int index,
             int youngAnimalsCountToSell,
             int adultAnimalsCountToSell,
