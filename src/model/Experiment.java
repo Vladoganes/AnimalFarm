@@ -5,7 +5,7 @@ import java.util.Random;
 public class Experiment {
     private int currentYear;
     private final int contractPeriod;
-    private final double alpha = 0.7; // birthCoefficientFromAdult
+    private final double alpha = 0.9; // birthCoefficientFromAdult
     private final double beta = 0.3; // birthCoefficientFromOld
     private final double delta = 0.8; // survivalCoefficientOfYoungAnimal
     private final double ro = 0.4; // deathCoefficientOfOldAnimal

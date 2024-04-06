@@ -50,7 +50,7 @@ public class StatisticsWindowFrame extends JFrame {
 
     Font titleFont = new Font("Arial", Font.BOLD, 28);
     Font tableColumnTitlesFont = new Font("Arial", Font.BOLD, 20);
-    Font severalTextFont = new Font("Arial", Font.PLAIN, 16);
+    Font severalTextFont = new Font("Comic Sans MS", Font.PLAIN, 16);
 
     public StatisticsWindowFrame() {
         super("AnimalFarm: Statistics");
@@ -74,7 +74,7 @@ public class StatisticsWindowFrame extends JFrame {
         statisticsTable.setBackground(shampine);
 
         statisticsTable.getTableHeader().setFont(tableColumnTitlesFont);
-        statisticsTable.setRowHeight(70);
+        statisticsTable.setRowHeight(80);
         statisticsTable.setFont(severalTextFont);
         tableContainer.add(tableName, BorderLayout.NORTH);
         tableContainer.add(new JScrollPane(

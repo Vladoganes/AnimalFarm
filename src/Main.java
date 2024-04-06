@@ -86,15 +86,15 @@ public class Main {
         JLabel penaltyContractLabel = new JLabel("Неустойка за 1 животное (у.е.)");
         penaltyContractLabel.setFont(severalLabelsFont);
 
-        JSpinner capitalFarmField = new JSpinner(new SpinnerNumberModel(1000, 10, 10_000_000, 10));
-        JSpinner youngCountFarmField = new JSpinner(new SpinnerNumberModel(10, 1, 100_000, 1));
+        JSpinner capitalFarmField = new JSpinner(new SpinnerNumberModel(10000, 10, 10_000_000, 10));
+        JSpinner youngCountFarmField = new JSpinner(new SpinnerNumberModel(15, 1, 100_000, 1));
         JSpinner adultCountFarmField = new JSpinner(new SpinnerNumberModel(10, 1, 100_000, 1));
         JSpinner oldCountFarmField = new JSpinner(new SpinnerNumberModel(10, 1, 100_000, 1));
 
         JSpinner periodContractField = new JSpinner(new SpinnerNumberModel(3, 3, 5, 1));
-        JSpinner youngToSellContractField = new JSpinner(new SpinnerNumberModel(5, 1, 100_000, 1));
-        JSpinner adultToSellContractField = new JSpinner(new SpinnerNumberModel(5, 1, 100_000, 1));
-        JSpinner oldToSellContractField = new JSpinner(new SpinnerNumberModel(5, 1, 100_000, 1));
+        JSpinner youngToSellContractField = new JSpinner(new SpinnerNumberModel(3, 1, 100_000, 1));
+        JSpinner adultToSellContractField = new JSpinner(new SpinnerNumberModel(4, 1, 100_000, 1));
+        JSpinner oldToSellContractField = new JSpinner(new SpinnerNumberModel(2, 1, 100_000, 1));
         JSpinner youngPriceContractField = new JSpinner(new SpinnerNumberModel(1000, 100, 100_000, 100));
         JSpinner adultPriceContractField = new JSpinner(new SpinnerNumberModel(1000, 100, 100_000, 100));
         JSpinner oldPriceContractField = new JSpinner(new SpinnerNumberModel(1000, 100, 100_000, 100));

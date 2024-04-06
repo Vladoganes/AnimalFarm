@@ -319,7 +319,12 @@ public class Farm {
         info[8] = new DecimalFormat("#0.00").format(currentYearProfit - currentYearCost);
         info[9] = new DecimalFormat("#0.00").format(currentYearCost);
         info[10] = new DecimalFormat("#0.00").format(countCurrentYearProfitability());
-        info[11] = Boolean.toString(isBankrupt);
+
+        if (isBankrupt) {
+            info[11] = "ДА";
+        } else {
+            info[11] = "НЕТ";
+        }
 
         info[13] = Integer.toString(newGeneration[0]);
         info[14] = Integer.toString(newGeneration[1]);
